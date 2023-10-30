@@ -1,17 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
-using System.IO.Compression;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Threading;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace ImageProcessing
 {
@@ -204,141 +197,6 @@ namespace ImageProcessing
             {
                 formatConvertedBitmap = null;
                 return await Task.FromResult((formatConvertedBitmap, dd.Message));
-            }
-        }
-    }
-
-    /// <summary>
-    /// Třída ToByteArray poskytuje metody pro převod různých typů obrázků na pole bajtů.
-    /// </summary>
-    public sealed class ToByteArray
-    {
-        /// <summary>
-        /// Převede BitmapImage na pole bajtů.
-        /// </summary>
-        /// <param name="bitmapImage">BitmapImage pro převod</param>
-        /// <returns>Pole bajtů a chybová zpráva</returns>
-        public static async Task<(byte[] ByteArray, string Error)> ImageByteArray(BitmapImage bitmapImage)
-        {
-            var frame = BitmapFrame.Create(bitmapImage);
-            return await ImageByteArray(frame);
-        }
-
-        /// <summary>
-        /// Převede URI na pole bajtů.
-        /// </summary>
-        /// <param name="uri">URI obrázku</param>
-        /// <returns>Pole bajtů a chybová zpráva</returns>
-        public static async Task<(byte[] ByteArray, string Error)> ImageByteArray(Uri uri)
-        {
-            var frame = BitmapFrame.Create(uri);
-            return await ImageByteArray(frame);
-        }
-
-        /// <summary>
-        /// Převede stream na pole bajtů.
-        /// </summary>
-        /// <param name="stream">Stream s obrázkem</param>
-        /// <returns>Pole bajtů a chybová zpráva</returns>
-        public static async Task<(byte[] ByteArray, string Error)> ImageByteArray(Stream stream)
-        {
-            var frame = BitmapFrame.Create(stream);
-            return await ImageByteArray(frame);
-        }
-
-        /// <summary>
-        /// Převede BitmapSource na pole bajtů.
-        /// </summary>
-        /// <param name="bitmapSource">BitmapSource pro převod</param>
-        /// <returns>Pole bajtů a chybová zpráva</returns>
-        public static async Task<(byte[] ByteArray, string Error)> ImageByteArray(BitmapSource bitmapSource)
-        {
-            var frame = BitmapFrame.Create(bitmapSource);
-            return await ImageByteArray(frame);
-        }
-
-        private static Task<(byte[] ByteArray, string Error)> ImageByteArray(BitmapFrame bitmapFrame)
-        {
-            byte[] imageBytes = null;
-            try
-            {
-                using (MemoryStream stream = new MemoryStream())
-                {
-                    BitmapEncoder encoder = new PngBitmapEncoder(); // Můžete použít jiný encoder podle potřeby
-                    encoder.Frames.Add(bitmapFrame);
-                    encoder.Save(stream);
-
-                    imageBytes = stream.ToArray();
-                    return Task.FromResult((imageBytes, string.Empty));
-                }
-            }
-            catch (Exception ex)
-            {
-                imageBytes = null;
-                return Task.FromResult((imageBytes, $"Chyba při převodu na pole bajtů: {ex.Message}"));
-            }
-        }
-    }
-
-    /// <summary>
-    /// Třída FromByteArray poskytuje metody pro převod pole bajtů na různé typy obrázků.
-    /// </summary>
-    public sealed class FromByteArray
-    {
-        /// <summary>
-        /// Převede pole bajtů na BitmapImage.
-        /// </summary>
-        /// <param name="byteArray">Pole bajtů</param>
-        /// <returns>BitmapImage a chybová zpráva</returns>
-        public static (BitmapImage IMG, string Error) ByteArrayToBitmapImage(byte[] byteArray)
-        {
-            if (byteArray == null || byteArray.Length == 0)
-            {
-                return (null, "Chyba: Pole bajtů je null nebo prázdné.");
-            }
-
-            try
-            {
-                using (MemoryStream stream = new MemoryStream(byteArray))
-                {
-                    BitmapImage bitmapImage = new BitmapImage();
-                    bitmapImage.BeginInit();
-                    bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-                    bitmapImage.StreamSource = stream;
-                    bitmapImage.EndInit();
-
-                    return (bitmapImage, string.Empty);
-                }
-            }
-            catch (Exception ex)
-            {
-                return (null, $"Chyba při převodu pole bajtů na BitmapImage: {ex.Message}");
-            }
-        }
-
-        /// <summary>
-        /// Převede pole bajtů na Bitmap.
-        /// </summary>
-        /// <param name="byteArray">Pole bajtů</param>
-        /// <returns>Bitmap a chybová zpráva</returns>
-        public static (Bitmap IMG, string Error) ByteArrayToBitmap(byte[] byteArray)
-        {
-            if (byteArray == null || byteArray.Length == 0)
-            {
-                return (null, "Chyba: Pole bajtů je null nebo prázdné.");
-            }
-
-            try
-            {
-                using (MemoryStream stream = new MemoryStream(byteArray))
-                {
-                    Bitmap bitmap = new Bitmap(stream);
-                    return (bitmap, string.Empty);
-                }
-            }
-            catch (Exception ex)
-            {
-                return (null, $"Chyba při převodu pole bajtů na Bitmap: {ex.Message}");
             }
         }
     }
